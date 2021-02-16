@@ -1,0 +1,164 @@
+" Plugins----------------------------------------------------------------------
+" Specify a directory for plugins
+" - Avoid using standard Vim directory names like 'plugin'
+call plug#begin('~/.vim/plugged')
+
+" Plugins
+Plug 'https://github.com/ycm-core/YouCompleteMe.git'
+Plug 'morhetz/gruvbox'
+Plug 'scrooloose/nerdtree'
+Plug 'https://github.com/kien/ctrlp.vim'
+Plug 'https://github.com/rking/ag.vim.git'
+Plug 'mbbill/undotree'
+Plug 'mg979/vim-visual-multi', {'branch': 'master'}
+Plug 'tpope/vim-eunuch'
+Plug 'mileszs/ack.vim'
+Plug 'szw/vim-maximizer'
+
+" Initialize plugin system
+call plug#end()
+
+" Settings---------------------------------------------------------------------
+" Executes a local vimrc if there is one
+set exrc
+" Hides the buffer
+set hidden
+" Saves the file at some checkpoints
+set autowrite
+
+" Colour Scheme from GruvBox
+colorscheme gruvbox
+" Dark Theme
+set background=dark
+" Coulors the file
+set termguicolors
+" Numbers the file
+set nu
+" Prevents text from wrapping
+set nowrap
+" Shows real time relative number
+set relativenumber
+" Colours the 80th column
+set colorcolumn=80
+" Leaves a blank column to see errors in
+set signcolumn=yes
+" Actively highlights search terms
+set incsearch
+
+" Time to wait (milli seconds) to write swap file to disl
+set updatetime=50
+" Expands tabs to spaces
+set expandtab
+" Tab size
+set tabstop=4
+" Tab size while inserting
+set softtabstop=4
+" Automatically aligns formatting to 4 spaces
+set shiftwidth=4
+
+" Prevents vim from creating a swap file
+set noswapfile
+" Prevents vim from creating a backup file
+set nobackup
+" Creating an undo directory for vim
+set undodir=~/.vim/undodir
+" Setting the undo file
+set undofile
+
+" Autocomplete vim commands
+set completeopt=menuone,noinsert,noselect
+
+" Setting no timeout for leader
+set notimeout
+
+" Definations------------------------------------------------------------------
+let mapleader = " "
+let g:ctrlp_user_command = ['.git/']
+let g:ag_working_path_mode = "r"
+
+" Ag items
+if executable('ag')
+    " Use ag over grep
+    set grepprg=ag\ --nogroup\ --nocolor\ --column
+
+    " Use ag over ack
+    let g:ackprg='ag --vimgrep'
+
+    " Use ag in CtrlP for listing files.
+    " Lightning fast and respects
+    let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+
+    " Ag is fast enough that CtrlP doesn't need to cache
+    let g:ctrlp_use_caching = 0
+endif
+
+" Nerd Tree
+let NERDTreeMinimalUI = 1
+
+" You Complete Me
+" - With debug
+let g:ycm_key_list_select_completion = ['<TAB>']
+let g:ycm_key_list_previous_completion = []
+let g:ycm_max_diagnostics_to_display=0
+let g:ycm_server_keep_logfiles = 1
+let g:ucm_server_log_level = 'debug'
+let g:ycm_server_use_vim_stdout = 1
+let g:ycm_warning_symbol = '.'
+let g:ycm_error_symbol = '..'
+
+" Remaps-----------------------------------------------------------------------
+" - This is where the magic of vim happens
+
+" Hopping windows
+map <leader>h :wincmd h<CR>
+map <leader>j :wincmd j<CR>
+map <leader>k :wincmd k<CR>
+map <leader>l :wincmd l<CR>
+
+" Compiling and running cpp
+map <leader>cpp :w <CR> :!clear && g++ % -o %< && ./%<<CR>
+
+" Compiling and running c
+map <leader>cc :w <CR> :!clear && gcc % -o %< && ./%<<CR>
+
+" Custom shortcuts
+imap `co cout << "" << endl;
+imap `inc #include <iostream><Enter>#include <cstdio><Enter><Enter>using namespace std;<Enter><Esc>
+imap `main int main()<Enter>{<Enter>return 0;<Enter>}
+
+" File finder
+map <leader>pf :CtrlP<CR>
+
+" Nerd Tree
+nnoremap <leader>nt :NERDTreeToggle<CR>
+nnoremap <silent><leader>nf :NERDTreeFind<CR>
+
+" Undo Tree
+nnoremap <leader>ut :UndotreeToggle<CR>
+nnoremap <leader>uf :UndotreeFocus<CR>
+
+" Vertical resizing
+nnoremap <silent><leader>r+ :vertical resize +5<CR>
+nnoremap <silent><leader>r- :vertical resize -5<CR>
+
+" Horizontal resizing
+map - <C-W>-
+map + <C-W>+
+
+" Ycm
+nnoremap <silent><leader>gd :YcmCompleter GoTo<CR>
+nnoremap <silent><leader>gf: YcmCompleter FixIr<CR>
+
+" Functions--------------------------------------------------------------------
+" Function to trim white spaces
+fun! TrimWhiteSpaces()
+    let l:save = winsaveview()
+    keeppatterns %s/\s\+$//e
+    call winrestview(l:save)
+endfun
+
+" Autogroup called TRAIL_REMOVER
+augroup TRAIL_REMOVER
+    autocmd!
+    autocmd BufWritePre * :call TrimWhiteSpaces()
+augroup END
